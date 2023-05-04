@@ -29,6 +29,7 @@ import com.karankumar.bookproject.security.jwt.JwtUsernamePasswordAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -52,6 +53,7 @@ import java.util.List;
 @EnableWebSecurity
 @Configuration
 @ExcludeFromJacocoGeneratedReport
+//@Profile("disable-security")
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
   private final UserService userService;
   private final DatabaseUserDetailsService databaseUserDetailsService;
@@ -101,7 +103,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     return super.authenticationManagerBean();
   }
 
-  @Override
+ /*@Override
   public void configure(WebSecurity web) {
     web.ignoring()
         .antMatchers(
@@ -116,7 +118,19 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/frontend/**",
             "/frontend-es5/**",
             "/frontend-es6/**");
-  }
+  }*/
+
+  /*@Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http
+            .authorizeRequests()
+            .antMatchers("/**", "/h2-console/**")
+            .permitAll()
+            .anyRequest().authenticated()
+            .and()
+            .csrf().disable()
+            .headers().frameOptions().disable();
+  }*/
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -131,7 +145,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .addFilterAfter(
             new JwtTokenVerifier(secretKey, jwtConfig), JwtUsernamePasswordAuthFilter.class)
         .authorizeRequests()
-        .antMatchers(HttpMethod.POST, Mappings.USER)
+        .antMatchers(HttpMethod.POST, Mappings.USER, "/**", "/h2-console/**")
         .permitAll()
         .anyRequest()
         .authenticated();
